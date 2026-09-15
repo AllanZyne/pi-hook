@@ -1,0 +1,14 @@
+{
+  "name": "pi-hook",
+  "version": "0.1.0",
+  "description": "Run shell commands for native pi extension events",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
