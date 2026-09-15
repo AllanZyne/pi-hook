@@ -229,12 +229,19 @@ export default function (pi: ExtensionAPI) {
 
     on(eventName, async (event, ctx) => {
       // `input` is reserved for text typed by the human in the TUI. RPC input
-      // and extension-injected messages deliberately do not run input hooks.
+      // and extension-injected messages (e.g. pi.sendUserMessage()) deliberately
+      // do not run input hooks. They still produce a real user-role message and
+      // thus a matching `message_start` below, so we must still push a (empty)
+      // entry here to keep pendingInputOutput aligned 1:1 with message_start.
+      // Returning early without pushing would let message_start's shift() steal
+      // the entry queued for a later, genuinely interactive message, causing the
+      // hook output to permanently drift and show the previous turn's result.
       if (
         eventName === "input" &&
         (!event || typeof event !== "object" ||
           (event as { source?: unknown }).source !== "interactive")
       ) {
+        pendingInputOutput.push([]);
         return;
       }
 
