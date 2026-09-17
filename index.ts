@@ -64,11 +64,21 @@ type HookResult = {
 };
 
 function loadConfig(): HookConfig {
+  let raw: string;
+  try {
+    raw = readFileSync(CONFIG_PATH, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") {
+      console.warn(`[pi-hook] Cannot read ${CONFIG_PATH}: ${String(error)}`);
+    }
+    return {};
+  }
+
   let value: unknown;
   try {
-    value = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+    value = JSON.parse(raw);
   } catch (error) {
-    console.warn(`[pi-hook] Cannot read ${CONFIG_PATH}: ${String(error)}`);
+    console.warn(`[pi-hook] Cannot parse ${CONFIG_PATH}: ${String(error)}`);
     return {};
   }
 
